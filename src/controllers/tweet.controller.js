@@ -9,6 +9,9 @@ import uploadFileOnCloudinary, {
 
 const createTweet = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Tweets']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   //TODO: create tweet
   const { content } = req.body;
   if (!content) throw new ApiError(400, "Content field require");
@@ -77,6 +80,9 @@ const getUserTweets = asyncHandler(async (req, res) => {
 
 const updateTweet = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Tweets']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   //TODO: update tweet
   const { tweetId } = req.params;
   const { content } = req.body;
@@ -118,6 +124,9 @@ const updateTweet = asyncHandler(async (req, res) => {
 
 const deleteTweet = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Tweets']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   //TODO: delete tweet
   // Extract tweet ID from request parameters
   const { tweetId } = req.params;

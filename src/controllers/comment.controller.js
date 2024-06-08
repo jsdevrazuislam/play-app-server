@@ -82,6 +82,9 @@ const getVideoComments = asyncHandler(async (req, res) => {
 
 const addComment = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Comments']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   // TODO: add a comment to a video
   const { content } = req.body;
   const { videoId } = req.params;
@@ -100,6 +103,9 @@ const addComment = asyncHandler(async (req, res) => {
 
 const updateComment = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Comments']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   // TODO: update a comment
   const { commentId } = req.params;
   const { content } = req.body;
@@ -132,6 +138,9 @@ const updateComment = asyncHandler(async (req, res) => {
 
 const deleteComment = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Comments']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   // TODO: delete a comment
   const { commentId } = req.params;
   if (!isValidObjectId(commentId))

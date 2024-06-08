@@ -7,6 +7,9 @@ import { Video } from "../models/video.models.js";
 
 const createPlaylist = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Playlist']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   //TODO: create playlist
   const { name, description, videoIds } = req.body;
   if (!(name || description || !Array.isArray(videoIds)))
@@ -97,6 +100,9 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
 
 const getPlaylistById = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Playlist']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   //TODO: get playlist by id
   const { playlistId } = req.params;
   if (!isValidObjectId(playlistId))
@@ -156,6 +162,9 @@ const getPlaylistById = asyncHandler(async (req, res) => {
 
 const addVideoToPlaylist = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Playlist']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   const { playlistId, videoId } = req.params;
 
   // Validate playlistId and videoId
@@ -192,6 +201,9 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
 
 const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Playlist']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   // TODO: remove video from playlist
   const { playlistId, videoId } = req.params;
   // Validate playlistId and videoId
@@ -216,6 +228,9 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
 
 const deletePlaylist = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Playlist']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   // TODO: delete playlist
   const { playlistId } = req.params;
   if (!isValidObjectId(playlistId))
@@ -239,6 +254,9 @@ const deletePlaylist = asyncHandler(async (req, res) => {
 
 const updatePlaylist = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Playlist']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   //TODO: update playlist
   const { playlistId } = req.params;
   const { name, description } = req.body;
