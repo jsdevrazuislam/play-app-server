@@ -17,6 +17,7 @@ router
   .route("/")
   .get(getAllVideos)
   .post(
+    verifyJWT,
     upload.fields([
       {
         name: "videoFile",
@@ -34,7 +35,7 @@ router
   .route("/:videoId")
   .get(getVideoById)
   .delete(verifyJWT, deleteVideo)
-  .patch(upload.single("thumbnail"), verifyJWT, updateVideo);
+  .patch(verifyJWT, upload.single("thumbnail"), updateVideo);
 
 router.route("/toggle/publish/:videoId").patch(verifyJWT, togglePublishStatus);
 router.route("/view/:videoId").patch(updateView)
