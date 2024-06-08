@@ -1,5 +1,6 @@
 import mongoose, { isValidObjectId } from "mongoose";
 import { Video } from "../models/video.models.js";
+import { Subscription } from "../models/subscriptions.models.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
@@ -8,6 +9,7 @@ import uploadFileOnCloudinary, {
   removeOldVideoOnCloudinary,
 } from "../utils/cloudinary.js";
 import { formatDuration } from "../utils/helper.js";
+import { Notification } from "../models/notications.models.js";
 
 const getAllVideos = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Videos']
@@ -119,6 +121,21 @@ const publishAVideo = asyncHandler(async (req, res) => {
     duration,
     owner: req.user?._id,
   });
+  // send notification to this channel subscribers
+  const subscribers = await Subscription.find({
+    channel: req.user?._id,
+  }).populate(
+    "subscriber",
+    "-password -watchHistory -refreshToken -updatedAt -createdAt -__v"
+  );
+  const notifications = subscribers.map((sub) => ({
+    user: sub.subscriber._id,
+    message: `${req.user?.username} uploaded new video: ${video.title}`,
+    videoThumbnail: video.thumbnail,
+    channelAvatar: req.user?.avatar,
+  }));
+
+  await Notification.insertMany(notifications);
   //   return response user
   res
     .status(201)
