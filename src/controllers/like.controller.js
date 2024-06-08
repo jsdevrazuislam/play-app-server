@@ -5,6 +5,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const toggleVideoLike = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Likes']
   const { videoId } = req.params;
   //TODO: toggle like on video
   if (!isValidObjectId(videoId)) throw new ApiError(400, "Video is not valid");
@@ -24,6 +25,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 });
 
 const toggleCommentLike = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Likes']
   const { commentId } = req.params;
   //TODO: toggle like on comment
   if (!isValidObjectId(commentId))
@@ -50,6 +52,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 });
 
 const toggleTweetLike = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Likes']
   const { tweetId } = req.params;
   //TODO: toggle like on tweet
   if (!isValidObjectId(tweetId)) throw new ApiError(400, "Video is not valid");
@@ -76,6 +79,7 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 });
 
 const getLikedVideos = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Likes']
   //TODO: get all liked videos
   const likedVideos = await Like.aggregate([
     {

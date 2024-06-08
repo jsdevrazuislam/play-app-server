@@ -5,6 +5,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const toggleSubscription = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Subscription']
   // TODO: toggle subscription
   // get data from frontend
   const { channelId } = req.params;
@@ -40,6 +41,7 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 });
 // controller to return subscriber list of a channel
 const getUserChannelSubscribers = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Subscription']
   // get data from frontend
   const { channelId } = req.params;
   //   validate data
@@ -108,6 +110,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 });
 // controller to return channel list to which user has subscribed
 const getSubscribedChannels = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Subscription']
   const { subscriberId } = req.params;
 
   //   validate data
