@@ -3,8 +3,8 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { DATA_LIMIT } from "./constants.js";
-import { swagger } from "../swagger.js";
-
+import swaggerUi from "swagger-ui-express";
+import swaggerDocument from '../swagger.output.json' assert { type: 'json' };
 
 const app = express();
 
@@ -29,7 +29,7 @@ app.use(
   })
 );
 
-swagger(app)
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Import Routes
 import userRouter from './routes/user.routes.js';

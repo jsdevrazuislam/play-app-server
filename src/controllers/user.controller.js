@@ -37,6 +37,7 @@ const generateAccessTokenAndRefreshToken = async (userId) => {
 };
 
 const register = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Users']
   // Get user details from frontend
   const { fullName, email, username, password } = req.body;
   // validation
@@ -86,6 +87,7 @@ const register = asyncHandler(async (req, res) => {
 });
 
 const login = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Users']
   // get data from frontend || user
   const { email, username, password } = req.body;
   // validate user data
@@ -125,6 +127,7 @@ const login = asyncHandler(async (req, res) => {
 });
 
 const logout = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Users']
   await User.findByIdAndUpdate(
     req?.user?._id,
     {
@@ -183,6 +186,7 @@ const refreshToken = asyncHandler(async (req, res) => {
 });
 
 const changedPassword = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Users']
   // get data from user
   const { oldPassword, newPassword } = req.body;
   // find user and check validate
@@ -201,6 +205,7 @@ const changedPassword = asyncHandler(async (req, res) => {
 });
 
 const updateUserDetails = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Users']
   // get data from user
   const { fullName, email, username } = req.body;
   // check data is valid or
@@ -226,6 +231,7 @@ const updateUserDetails = asyncHandler(async (req, res) => {
 });
 
 const updateAvatarImage = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Users']
   // get file from user
   const avatarLocalPath = req.file?.path;
   // validate file path
@@ -252,6 +258,7 @@ const updateAvatarImage = asyncHandler(async (req, res) => {
 });
 
 const updateCoverImage = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Users']
   // get file from user
   const coverImageLocalPath = req.file?.path;
   // validate file path
@@ -278,6 +285,7 @@ const updateCoverImage = asyncHandler(async (req, res) => {
 });
 
 const getChannelProfile = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Users']
   // get data from url
   const { username } = req.params;
   // validate data
@@ -349,6 +357,7 @@ const getChannelProfile = asyncHandler(async (req, res) => {
 });
 
 const getWatchHistory = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Users']
   const user = await User.aggregate([
     {
       $match: {

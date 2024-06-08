@@ -8,6 +8,7 @@ import uploadFileOnCloudinary, {
 } from "../utils/cloudinary.js";
 
 const createTweet = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Tweets']
   //TODO: create tweet
   const { content } = req.body;
   if (!content) throw new ApiError(400, "Content field require");
@@ -30,6 +31,7 @@ const createTweet = asyncHandler(async (req, res) => {
 });
 
 const getUserTweets = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Tweets']
   // TODO: get user tweets
   const { userId } = req.params;
   if (!isValidObjectId(userId)) throw new ApiError(400, "User not valid");
@@ -74,6 +76,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
 });
 
 const updateTweet = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Tweets']
   //TODO: update tweet
   const { tweetId } = req.params;
   const { content } = req.body;
@@ -114,6 +117,7 @@ const updateTweet = asyncHandler(async (req, res) => {
 });
 
 const deleteTweet = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Tweets']
   //TODO: delete tweet
   // Extract tweet ID from request parameters
   const { tweetId } = req.params;

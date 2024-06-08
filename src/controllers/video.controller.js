@@ -10,6 +10,7 @@ import uploadFileOnCloudinary, {
 import { formatDuration } from "../utils/helper.js";
 
 const getAllVideos = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Videos']
   //TODO: get all videos based on query, sort, pagination
   // Get parameters from the request query
   const {
@@ -78,6 +79,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
 });
 
 const publishAVideo = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Videos']
   // TODO: get video, upload to cloudinary, create video
   // get data from frontend
   const { title, description } = req.body;
@@ -124,6 +126,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
 });
 
 const getVideoById = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Videos']
   //TODO: get video by id
   //   get data from frontend
   const { videoId } = req.params;
@@ -170,6 +173,7 @@ const getVideoById = asyncHandler(async (req, res) => {
 });
 
 const updateVideo = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Videos']
   //TODO: update video details like title, description, thumbnail
   // get data from frontend
   const { videoId } = req.params;
@@ -214,6 +218,7 @@ const updateVideo = asyncHandler(async (req, res) => {
 });
 
 const deleteVideo = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Videos']
   //TODO: delete video
   //   get data from frontend
   const { videoId } = req.params;
@@ -238,6 +243,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
 });
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Videos']
   // get data from frontend
   const { videoId } = req.params;
   if (!isValidObjectId(videoId)) throw new ApiError(400, "Video not found");

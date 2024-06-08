@@ -16,43 +16,6 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-
-/**
- * @swagger
- * tags:
- *   name: User
- *   description: Operations related to users
- */
-
-/**
- * @swagger
- * /api/v1/users/register:
- *   post:
- *     summary: Create a new user
- *     tags: [User]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *               avatar:
- *                 type: string
- *               fullName:
- *                 type: string
- *     responses:
- *       201:
- *         description: User created successfully
- *       400:
- *         description: Invalid request body
- */
 router.route("/register").post(
   upload.fields([
     {
