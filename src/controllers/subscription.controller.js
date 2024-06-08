@@ -6,6 +6,9 @@ import asyncHandler from "../utils/asyncHandler.js";
 
 const toggleSubscription = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Subscription']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   // TODO: toggle subscription
   // get data from frontend
   const { channelId } = req.params;

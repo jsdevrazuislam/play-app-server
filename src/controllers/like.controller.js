@@ -6,6 +6,9 @@ import asyncHandler from "../utils/asyncHandler.js";
 
 const toggleVideoLike = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Likes']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   const { videoId } = req.params;
   //TODO: toggle like on video
   if (!isValidObjectId(videoId)) throw new ApiError(400, "Video is not valid");
@@ -26,6 +29,9 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 
 const toggleCommentLike = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Likes']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   const { commentId } = req.params;
   //TODO: toggle like on comment
   if (!isValidObjectId(commentId))
@@ -53,6 +59,9 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 
 const toggleTweetLike = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Likes']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   const { tweetId } = req.params;
   //TODO: toggle like on tweet
   if (!isValidObjectId(tweetId)) throw new ApiError(400, "Video is not valid");
@@ -80,6 +89,9 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 
 const getLikedVideos = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Likes']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   //TODO: get all liked videos
   const likedVideos = await Like.aggregate([
     {

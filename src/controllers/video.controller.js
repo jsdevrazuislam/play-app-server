@@ -174,6 +174,9 @@ const getVideoById = asyncHandler(async (req, res) => {
 
 const updateVideo = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Videos']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   //TODO: update video details like title, description, thumbnail
   // get data from frontend
   const { videoId } = req.params;
@@ -218,6 +221,9 @@ const updateVideo = asyncHandler(async (req, res) => {
 });
 
 const deleteVideo = asyncHandler(async (req, res) => {
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   // #swagger.tags = ['Videos']
   //TODO: delete video
   //   get data from frontend
@@ -244,6 +250,9 @@ const deleteVideo = asyncHandler(async (req, res) => {
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Videos']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   // get data from frontend
   const { videoId } = req.params;
   if (!isValidObjectId(videoId)) throw new ApiError(400, "Video not found");
@@ -270,6 +279,27 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
   );
 });
 
+const updateView = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Videos']
+  const { videoId } = req.params;
+  if (!isValidObjectId(videoId))
+    throw new ApiError(400, "Video Id is not valid");
+  const video = await Video.findById(videoId).populate(
+    "owner",
+    "-password -watchHistory -refreshToken -updatedAt -createdAt -__v"
+  );
+
+  if (!video) throw new ApiError(404, "Video not found");
+
+  video.views += 1;
+
+  await video.save();
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, video, "Video view increment successfully"));
+});
+
 export {
   getAllVideos,
   publishAVideo,
@@ -277,4 +307,5 @@ export {
   updateVideo,
   deleteVideo,
   togglePublishStatus,
+  updateView,
 };

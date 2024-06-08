@@ -3,11 +3,20 @@ import swaggerAutogen from 'swagger-autogen';
 const doc = {
   info:{
     title:"Playtube RestAPI",
-    description:"Test description"
+    description:"A simple Playtube API application with Swagger"
   },
   host: 'localhost:3000',
   schemas:['http'],
-  tags:[]
+  tags:[],
+  components: {
+    securitySchemes:{
+        bearerAuth: {
+            type: 'http',
+            scheme: 'bearer'
+        }
+    }
+}
+
 }
 
 const outputFile = './swagger.output.json';

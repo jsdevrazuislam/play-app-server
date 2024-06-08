@@ -128,6 +128,9 @@ const login = asyncHandler(async (req, res) => {
 
 const logout = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Users']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   await User.findByIdAndUpdate(
     req?.user?._id,
     {
@@ -148,6 +151,7 @@ const logout = asyncHandler(async (req, res) => {
 });
 
 const refreshToken = asyncHandler(async (req, res) => {
+   // #swagger.tags = ['Users']
   // get token from user
   const incomingRefreshToken =
     req.cookies?.refreshToken || req.body?.refreshToken;
@@ -187,6 +191,9 @@ const refreshToken = asyncHandler(async (req, res) => {
 
 const changedPassword = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Users']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   // get data from user
   const { oldPassword, newPassword } = req.body;
   // find user and check validate
@@ -206,6 +213,9 @@ const changedPassword = asyncHandler(async (req, res) => {
 
 const updateUserDetails = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Users']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   // get data from user
   const { fullName, email, username } = req.body;
   // check data is valid or
@@ -232,6 +242,9 @@ const updateUserDetails = asyncHandler(async (req, res) => {
 
 const updateAvatarImage = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Users']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   // get file from user
   const avatarLocalPath = req.file?.path;
   // validate file path
@@ -259,6 +272,9 @@ const updateAvatarImage = asyncHandler(async (req, res) => {
 
 const updateCoverImage = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Users']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   // get file from user
   const coverImageLocalPath = req.file?.path;
   // validate file path
@@ -358,6 +374,9 @@ const getChannelProfile = asyncHandler(async (req, res) => {
 
 const getWatchHistory = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Users']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
   const user = await User.aggregate([
     {
       $match: {
