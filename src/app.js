@@ -4,11 +4,27 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import { DATA_LIMIT } from "./constants.js";
 import swaggerUi from "swagger-ui-express";
-import { verifyJWT } from "./middlewares/auth.middleware.js";
+import { avoidInProduction, verifyJWT } from "./middlewares/auth.middleware.js";
 import ApiError from "./utils/ApiError.js";
 import swaggerDocument from "../swagger.output.json" assert { type: "json" };
+import { rateLimit } from "express-rate-limit";
 
 const app = express();
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 min
+  max: 500,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_, __, ___, options) => {
+    throw new ApiError(
+      options.statusCode || 500,
+      `There are too many requests. You are only allowed ${
+        options.max
+      } requests per ${options.windowMs / 60000} minutes`
+    );
+  },
+});
 
 app.use(
   json({
@@ -21,6 +37,7 @@ app.use(
     limit: DATA_LIMIT,
   })
 );
+app.use(limiter);
 app.use(express.static("public"));
 app.use(cookieParser());
 app.use(morgan("dev"));
@@ -48,6 +65,8 @@ import tweetRouter from "./routes/tweet.routes.js";
 import playlistRouter from "./routes/playlist.routes.js";
 import dashboardRouter from "./routes/dashboard.routes.js";
 import notificationRouter from "./routes/notification.routes.js";
+import { getGeneratedCredentials, seedUsers } from "./seeds/users.seeds.js";
+import { getGeneratedVideos, videoSeeds } from "./seeds/videos.seeds.js";
 
 // Routes Middle
 app.use("/api/v1/users", userRouter);
@@ -59,6 +78,15 @@ app.use("/api/v1/tweets", tweetRouter);
 app.use("/api/v1/playlist", playlistRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
 app.use("/api/v1/notifications", notificationRouter);
+
+app.post("/api/v1/seed/created-credentials", avoidInProduction, seedUsers);
+app.get(
+  "/api/v1/seed/generated-credentials",
+  avoidInProduction,
+  getGeneratedCredentials
+);
+app.post("/api/v1/seed/created-videos", avoidInProduction, verifyJWT, videoSeeds);
+app.get("/api/v1/seed/generated-videos", avoidInProduction, getGeneratedVideos);
 
 app.get("*", (_, res) => {
   res.status(404).json({
@@ -80,6 +108,5 @@ app.use((err, req, res, next) => {
     });
   }
 });
-
 
 export default app;

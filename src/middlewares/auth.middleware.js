@@ -23,3 +23,16 @@ export const verifyJWT = asyncHandler(async(req, _, next) =>{
         throw new ApiError(500, 'Invalid access token')
     }
 })
+
+
+
+export const avoidInProduction = asyncHandler(async (req, res, next) => {
+    if (process.env.NODE_ENV === "development") {
+      next();
+    } else {
+      throw new ApiError(
+        403,
+        "This service is only available in the local environment."
+      );
+    }
+  });
