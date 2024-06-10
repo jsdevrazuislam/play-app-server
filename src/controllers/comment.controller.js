@@ -3,12 +3,14 @@ import { Comment } from "../models/comments.models.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import { emitSocketEvent } from "../socket/index.js";
+import { SocketEventEnum } from "../constants.js";
 
 const getVideoComments = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Comments']
   //TODO: get all comments for a video
   const { videoId } = req.params;
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 100 } = req.query;
   const limitNumber = parseInt(limit, 10);
   const pageNumber = parseInt(page, 10);
   if (!isValidObjectId(videoId)) throw new ApiError(400, "Video is not valid");
@@ -90,11 +92,23 @@ const addComment = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   if (!content) throw new ApiError(400, "Content field is require");
   if (!isValidObjectId(videoId)) throw new ApiError(400, "Video is not valid");
-  const comment = await Comment.create({
+  let comment = await Comment.create({
     content,
     video: videoId,
     owner: req.user?._id,
   });
+
+  comment = await comment.populate(
+    "owner",
+    "-password -watchHistory -refreshToken -updatedAt -createdAt -__v"
+  );
+
+  emitSocketEvent(
+    req,
+    `video_${videoId}`,
+    SocketEventEnum.ADD_VIDEO_COMMENT,
+    comment
+  );
 
   res
     .status(200)

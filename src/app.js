@@ -8,8 +8,23 @@ import { avoidInProduction, verifyJWT } from "./middlewares/auth.middleware.js";
 import ApiError from "./utils/ApiError.js";
 import swaggerDocument from "../swagger.output.json" assert { type: "json" };
 import { rateLimit } from "express-rate-limit";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import { initializeSocketIO } from "./socket/index.js";
 
 const app = express();
+
+const httpServer = createServer(app);
+
+const io = new Server(httpServer, {
+  pingTimeout: 60000,
+  cors: {
+    origin: [process.env.ORIGIN_URL, "http://localhost:5173"],
+    credentials: true,
+  },
+});
+
+app.set("io", io);
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 min
@@ -43,7 +58,7 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(
   cors({
-    origin: process.env.ORIGIN_URL,
+    origin: [process.env.ORIGIN_URL, "http://localhost:5173"],
     credentials: true,
   })
 );
@@ -85,8 +100,15 @@ app.get(
   avoidInProduction,
   getGeneratedCredentials
 );
-app.post("/api/v1/seed/created-videos", avoidInProduction, verifyJWT, videoSeeds);
+app.post(
+  "/api/v1/seed/created-videos",
+  avoidInProduction,
+  verifyJWT,
+  videoSeeds
+);
 app.get("/api/v1/seed/generated-videos", avoidInProduction, getGeneratedVideos);
+
+initializeSocketIO(io);
 
 app.get("*", (_, res) => {
   res.status(404).json({
@@ -109,4 +131,4 @@ app.use((err, req, res, next) => {
   }
 });
 
-export default app;
+export { httpServer };
