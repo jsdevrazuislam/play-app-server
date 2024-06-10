@@ -12,9 +12,9 @@ const videoSeeds = asyncHandler(async (req, res, next) => {
     title: `Javascript Tutorial ${index} || Js`,
     description: "Test Description For Javascript Video",
     videoFile:
-      "https://res.cloudinary.com/dqh3uisur/video/upload/v1717909377/143486-782758140_small_blrnfe.mp4",
+      "https://res.cloudinary.com/dqh3uisur/video/upload/v1717997778/213616_small_cukc5f.mp4",
     thumbnail:
-      "https://res.cloudinary.com/dqh3uisur/image/upload/v1717909754/purple-4165352_1280_w8o2ug.jpg",
+      "https://res.cloudinary.com/dqh3uisur/video/upload/v1717997778/213616_small_cukc5f.mp4",
     owner: req.user?._id,
     duration:'00:30'
   }));
