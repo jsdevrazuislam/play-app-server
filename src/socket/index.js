@@ -38,6 +38,10 @@ const initializeSocketIO = (io) => {
         console.log(`User joined the video comment room. VideoId: ${videoId}`);
         socket.join(`video_${videoId}`);
       });
+      socket.on(SocketEventEnum.JOIN_NOTIFICATION, (notificationId) => {
+        console.log(`User joined the notification room. Notification: ${notificationId}`);
+        socket.join(`notification_${notificationId}`);
+      });
 
       socket.on(SocketEventEnum.SOCKET_DISCONNECTED, () => {
         console.log(`User has disconnected userId: ${socket.user?._id}`);

@@ -11,6 +11,7 @@ const SocketEventEnum = Object.freeze({
     UPDATE_TWEET_COMMENT:'updateTweetComment',
     PUBLISH_VIDEO:"publishVideo",
     JOIN_COMMENT:'joinComment',
+    JOIN_NOTIFICATION:'joinNotification',
     SOCKET_ERROR:'socketError'
 });
 

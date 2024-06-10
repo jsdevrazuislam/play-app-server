@@ -10,6 +10,8 @@ import uploadFileOnCloudinary, {
 } from "../utils/cloudinary.js";
 import { formatDuration } from "../utils/helper.js";
 import { Notification } from "../models/notications.models.js";
+import { emitSocketEvent } from "../socket/index.js";
+import { SocketEventEnum } from "../constants.js";
 
 const getAllVideos = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Videos']
@@ -130,12 +132,28 @@ const publishAVideo = asyncHandler(async (req, res) => {
   );
   const notifications = subscribers.map((sub) => ({
     user: sub.subscriber._id,
-    message: `${req.user?.username} uploaded new video: ${video.title}`,
+    message: `uploaded new video: ${video.title}`,
     videoThumbnail: video.thumbnail,
     channelAvatar: req.user?.avatar,
   }));
 
-  await Notification.insertMany(notifications);
+  const notificationsData = await Notification.insertMany(notifications);
+  const populatedNotifications = await Notification.find({
+    _id: { $in: notificationsData.map((notification) => notification._id) },
+  }).populate(
+    "user",
+    "-password -watchHistory -refreshToken -updatedAt -createdAt -__v"
+  );
+
+  populatedNotifications.forEach((notification) => {
+    emitSocketEvent(
+      req,
+      `notification_${notification.user?._id}`,
+      SocketEventEnum.PUBLISH_VIDEO,
+      notification
+    );
+  });
+
   //   return response user
   res
     .status(201)
