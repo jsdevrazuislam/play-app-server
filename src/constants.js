@@ -12,7 +12,11 @@ const SocketEventEnum = Object.freeze({
     PUBLISH_VIDEO:"publishVideo",
     JOIN_COMMENT:'joinComment',
     JOIN_NOTIFICATION:'joinNotification',
-    SOCKET_ERROR:'socketError'
+    SOCKET_ERROR:'socketError',
+    JOIN_LIKE:'joinLike',
+    JOIN_DISLIKE:'joinDislike',
+    ADDED_LIKE:'addedLike',
+    ADDED_DISLIKE:'addedDislike',
 });
 
 export {

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import {
-    getLikedVideos,
+    getLikedVideo,
     toggleCommentLike,
     toggleVideoLike,
     toggleTweetLike,
@@ -12,6 +12,6 @@ const router = Router();
 router.route("/toggle/v/:videoId").post(verifyJWT, toggleVideoLike);
 router.route("/toggle/c/:commentId").post(verifyJWT,toggleCommentLike);
 router.route("/toggle/t/:tweetId").post(verifyJWT, toggleTweetLike);
-router.route("/videos").get(getLikedVideos);
+router.route("/video/:videoId").get(getLikedVideo);
 
 export default router
