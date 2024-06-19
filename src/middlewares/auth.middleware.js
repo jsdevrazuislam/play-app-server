@@ -4,10 +4,10 @@ import asyncHandler from '../utils/asyncHandler.js'
 import ApiError from '../utils/ApiError.js'
 
 
-export const verifyJWT = asyncHandler(async(req, _, next) =>{
+export const verifyJWT = asyncHandler(async(req,_,next) =>{
     try {
         // get token from user
-        const token = req?.cookies?.accessToken || req.headers("Authorization").replace("Bearer ", "");
+        const token = req?.cookies?.accessToken || req.headers["authorization"]?.replace("Bearer ", "");
         // check token exits or not
         if(!token) throw new ApiError(401, "Invalid access token");
         // verify token 

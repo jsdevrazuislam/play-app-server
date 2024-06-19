@@ -19,7 +19,7 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {
   pingTimeout: 60000,
   cors: {
-    origin: [process.env.ORIGIN_URL, "http://localhost:5173"],
+    origin: [process.env.ORIGIN_URL, "http://10.0.2.2:3000", "http://localhost:5173"],
     credentials: true,
   },
 });
@@ -58,7 +58,7 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(
   cors({
-    origin: [process.env.ORIGIN_URL, "http://localhost:5173"],
+    origin: [process.env.ORIGIN_URL, "http://10.0.2.2:3000", "http://localhost:5173"],
     credentials: true,
   })
 );

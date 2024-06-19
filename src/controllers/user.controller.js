@@ -90,6 +90,7 @@ const login = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Users']
   // get data from frontend || user
   const { email, username, password } = req.body;
+
   // validate user data
   if (!(email || username)) throw new ApiError(400, "Invalid User Credentials");
   if (email && !validateEmail(email)) throw new ApiError(400, "Invalid Email");
