@@ -103,6 +103,11 @@ const addComment = asyncHandler(async (req, res) => {
     "-password -watchHistory -refreshToken -updatedAt -createdAt -__v"
   );
 
+  comment =  await comment.populate(
+    "video",
+    "-updatedAt -createdAt -__v"
+  )
+
   emitSocketEvent(
     req,
     `video_${videoId}`,
