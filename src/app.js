@@ -80,6 +80,7 @@ import tweetRouter from "./routes/tweet.routes.js";
 import playlistRouter from "./routes/playlist.routes.js";
 import dashboardRouter from "./routes/dashboard.routes.js";
 import notificationRouter from "./routes/notification.routes.js";
+import categoryRouter from "./routes/category.routes.js";
 import { getGeneratedCredentials, seedUsers } from "./seeds/users.seeds.js";
 import { getGeneratedVideos, videoSeeds } from "./seeds/videos.seeds.js";
 
@@ -93,6 +94,7 @@ app.use("/api/v1/tweets", tweetRouter);
 app.use("/api/v1/playlist", playlistRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
 app.use("/api/v1/notifications", notificationRouter);
+app.use("/api/v1/categories", categoryRouter);
 
 app.post("/api/v1/seed/created-credentials", avoidInProduction, seedUsers);
 app.get(

@@ -75,10 +75,15 @@ const getVideoComments = asyncHandler(async (req, res) => {
     },
   ]);
 
+  const totalComments = await Comment.countDocuments();
+
   res
     .status(200)
     .json(
-      new ApiResponse(200, comments, "Video comments fetched successfully")
+      new ApiResponse(200, {
+        comments,
+        totalComments
+      }, "Video comments fetched successfully")
     );
 });
 

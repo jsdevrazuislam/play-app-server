@@ -19,6 +19,10 @@ const videoSchema = new Schema({
         min:[8, 'Title must be 8 char'],
         max:[250, 'Title must be less then 250 char']
     },
+    category:{
+        type:Schema.Types.ObjectId,
+        ref:'Category'
+    },
     description:{
         type:String,
         required:[true, 'Description is required'],

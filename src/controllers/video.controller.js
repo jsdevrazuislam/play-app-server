@@ -21,6 +21,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     page = 1,
     limit = 10,
     query = "",
+    category = "",
     sortBy = "createdAt",
     sortType = "asc",
   } = req.query;
@@ -37,12 +38,21 @@ const getAllVideos = asyncHandler(async (req, res) => {
       $or: [{ title: { $regex: query, $options: "i" } }],
     };
   }
+  let searchCategory = {}
+  if (category && typeof category === "string") {
+    // Example: if searching for category
+    const categoryObjectId = new mongoose.Types.ObjectId(category);
+    searchCategory = {
+    category: categoryObjectId,
+  };
+  }
 
   // Get videos with pagination, sorting and query
   const videos = await Video.aggregate([
     {
       $match: {
         isPublished: true,
+        ...searchCategory
       },
     },
     { $match: queryObject },
@@ -69,9 +79,28 @@ const getAllVideos = asyncHandler(async (req, res) => {
       },
     },
     {
+      $lookup:{
+        from:"categories",
+        localField:"category",
+        foreignField:"_id",
+        as:"category",
+        pipeline: [
+          {
+            $project: {
+              _id: 1,
+              content: 1,
+            },
+          },
+        ],
+      }
+    },
+    {
       $addFields: {
         owner: {
           $first: "$owner",
+        },
+        category: {
+          $first: "$category",
         },
       },
     },
@@ -86,9 +115,10 @@ const publishAVideo = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Videos']
   // TODO: get video, upload to cloudinary, create video
   // get data from frontend
-  const { title, description } = req.body;
+  const { title, description, category } = req.body;
   // validate data
-  if (!(title, description)) throw new ApiError(400, "All field is require");
+  if (!(title, description, category)) throw new ApiError(400, "All field is require");
+  if(!isValidObjectId(category)) throw new ApiError(400, "Category Not Valid");
   // get video and thumbnail from frontend
   let localVideoFile;
   if (
@@ -115,14 +145,18 @@ const publishAVideo = asyncHandler(async (req, res) => {
   if (!thumbnail.url)
     throw new ApiError(500, "Something went wrong while uploading thumbnail");
   // create video object - create entry in db
-  const video = await Video.create({
+  let video = await Video.create({
     title,
     description,
     thumbnail: thumbnail.url,
     videoFile: videoUrl.url,
     duration,
     owner: req.user?._id,
+    category
   });
+
+  video = await video.populate("category", "-updatedAt -createdAt -__v");
+  
   // send notification to this channel subscribers
   const subscribers = await Subscription.find({
     channel: req.user?._id,
@@ -215,7 +249,7 @@ const updateVideo = asyncHandler(async (req, res) => {
   //TODO: update video details like title, description, thumbnail
   // get data from frontend
   const { videoId } = req.params;
-  const { title, description } = req.body;
+  const { title, description, category } = req.body;
   // validate coming data
   if (!(title || description)) throw new ApiError(400, "All field require");
   const video = await Video.findOne({
@@ -240,6 +274,7 @@ const updateVideo = asyncHandler(async (req, res) => {
   // update data
   video.title = title;
   video.description = description;
+  video.category = category;
   if (thumbnailUrl?.url) {
     video.thumbnail = thumbnailUrl.url;
   }
@@ -247,6 +282,10 @@ const updateVideo = asyncHandler(async (req, res) => {
   await saveVideo.populate(
     "owner",
     "-password -watchHistory -refreshToken -updatedAt -createdAt -__v"
+  );
+  await saveVideo.populate(
+    "category",
+    "-updatedAt -createdAt -__v"
   );
 
   //   return response
