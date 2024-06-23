@@ -24,6 +24,29 @@ export const verifyJWT = asyncHandler(async(req,_,next) =>{
     }
 })
 
+export const verifyAdminJWT = asyncHandler(async(req,_,next) =>{
+    try {
+        // get token from user
+        const token = req?.cookies?.accessToken || req.headers["authorization"]?.replace("Bearer ", "");
+        // check token exits or not
+        if(!token) throw new ApiError(401, "Invalid admin access token");
+        // verify token 
+        const decodedJWT = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        // check user exits
+        const user = await User.findOne({
+          _id: decodedJWT._id,
+          role:decodedJWT.role
+        }).select("-password -refreshToken");
+        // check user validation
+        if(!user) throw new ApiError(401,"Invalid admin access token")
+        // added values in request object
+        req.user = user;
+        next()
+    } catch (error) {
+        throw new ApiError(500, 'Invalid admin access token')
+    }
+})
+
 
 
 export const avoidInProduction = asyncHandler(async (req, res, next) => {

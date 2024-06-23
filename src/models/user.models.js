@@ -39,6 +39,11 @@ const userSchema = new Schema(
     refreshToken:{
         type:String,
     },
+    role:{
+        type:String,
+        default:"user",
+        enum:["user", "admin", "super-admin"]
+    },
     watchHistory:[
         {
             type:Schema.Types.ObjectId,
@@ -69,7 +74,8 @@ userSchema.methods.generateAccessToken = function(){
             _id:this._id,
             email:this.email,
             fullName:this.fullName,
-            username:this.username
+            username:this.username,
+            role:this.role
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
