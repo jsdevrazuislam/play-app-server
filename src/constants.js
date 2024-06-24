@@ -10,12 +10,14 @@ const SocketEventEnum = Object.freeze({
     ADD_TWEET_COMMENT:'addTweetComment',
     UPDATE_TWEET_COMMENT:'updateTweetComment',
     PUBLISH_VIDEO:"publishVideo",
-    JOIN_COMMENT:'joinComment',
+    // JOIN_COMMENT:'joinComment',
     JOIN_NOTIFICATION:'joinNotification',
     SOCKET_ERROR:'socketError',
-    JOIN_LIKE:'joinLike',
-    JOIN_DISLIKE:'joinDislike',
+    JOIN_VIDEO:'joinVideo',
+    // JOIN_LIKE:'joinLike',
+    // JOIN_DISLIKE:'joinDislike',
     ADDED_LIKE:'addedLike',
+    REMOVE_REACTION:'removeReaction',
     ADDED_DISLIKE:'addedDislike',
 });
 

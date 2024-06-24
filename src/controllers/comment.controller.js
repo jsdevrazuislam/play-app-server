@@ -111,13 +111,18 @@ const addComment = asyncHandler(async (req, res) => {
   comment =  await comment.populate(
     "video",
     "-updatedAt -createdAt -__v"
-  )
+  );
+
+  const totalComments = await Comment.countDocuments();
 
   emitSocketEvent(
     req,
     `video_${videoId}`,
     SocketEventEnum.ADD_VIDEO_COMMENT,
-    comment
+    {
+      comment,
+      totalComments
+    }
   );
 
   res

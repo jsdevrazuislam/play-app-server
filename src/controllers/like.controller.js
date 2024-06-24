@@ -27,7 +27,6 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
   let totalLike = 0;
   let totalUnlike = 0;
 
-
   if (!like) {
     like = new Like({ video: videoId, likedBy: [], disLikedBy: [] });
   }
@@ -50,6 +49,19 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Please prove valid body (like or dislike)");
   }
 
+  await like.save();
+  // Populate likedBy and disLikedBy fields
+  await like.populate(
+    "likedBy",
+    "-password -watchHistory -refreshToken -updatedAt -createdAt -__v"
+  );
+  await like.populate(
+    "disLikedBy",
+    "-password -watchHistory -refreshToken -updatedAt -createdAt -__v"
+  );
+  totalLike = (like.likedBy || []).length;
+  totalUnlike = (like.disLikedBy || []).length;
+
   // Only save if likedBy or disLikedBy is not empty
   if (like.likedBy.length === 0 && like.disLikedBy.length === 0) {
     if (like.isNew) {
@@ -58,40 +70,33 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, null, `${reaction} Successfully`));
     } else {
       await Like.deleteOne({ video: videoId });
-      res
-        .status(200)
-        .json(new ApiResponse(200, null, `${reaction} Successfully`));
-    }
-  } else {
-    await like.save();
-    // Populate likedBy and disLikedBy fields
-    await like.populate(
-      "likedBy",
-      "-password -watchHistory -refreshToken -updatedAt -createdAt -__v"
-    );
-    await like.populate(
-      "disLikedBy",
-      "-password -watchHistory -refreshToken -updatedAt -createdAt -__v"
-    );
-    totalLike = (like.likedBy || []).length;
-    totalUnlike = (like.disLikedBy || []).length;
-    if (reaction === "like") {
-      emitSocketEvent(req, `like_${videoId}`, SocketEventEnum.ADDED_LIKE, {
-        like, 
-        totalLike,
-        totalUnlike
-      });
-    } else {
       emitSocketEvent(
         req,
-        `dislike_${videoId}`,
-        SocketEventEnum.ADDED_DISLIKE,
+        `video_${videoId}`,
+        SocketEventEnum.REMOVE_REACTION,
         {
-          like, 
+          like,
           totalLike,
-          totalUnlike
+          totalUnlike,
         }
       );
+      res
+        .status(200)
+        .json(new ApiResponse(200, null, `${reaction} remove Successfully`));
+    }
+  } else {
+    if (reaction === "like") {
+      emitSocketEvent(req, `video_${videoId}`, SocketEventEnum.ADDED_LIKE, {
+        like,
+        totalLike,
+        totalUnlike,
+      });
+    } else {
+      emitSocketEvent(req, `video_${videoId}`, SocketEventEnum.ADDED_DISLIKE, {
+        like,
+        totalLike,
+        totalUnlike,
+      });
     }
     res
       .status(200)
