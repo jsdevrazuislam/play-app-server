@@ -13,7 +13,7 @@ const toggleSubscription = asyncHandler(async (req, res) => {
     }] */
   // TODO: toggle subscription
   // get data from frontend
-  const { channelId } = req.params;
+  const { channelId, videoId } = req.params;
   // validate data
   if (!isValidObjectId(channelId))
     throw new ApiError(400, "Channel is not valid");
@@ -40,7 +40,7 @@ const toggleSubscription = asyncHandler(async (req, res) => {
     });
     emitSocketEvent(
       req,
-      `video_${channelId}`,
+      `video_${videoId}`,
       SocketEventEnum.REMOVE_SUBSCRIBER,
       {
         totalChannelSubscribersCount:totalSubscribedCount,
@@ -67,9 +67,9 @@ const toggleSubscription = asyncHandler(async (req, res) => {
       subscriber: userId,
     });
 
-    emitSocketEvent(req, `video_${channelId}`, SocketEventEnum.ADD_SUBSCRIBER, {
+    emitSocketEvent(req, `video_${videoId}`, SocketEventEnum.ADD_SUBSCRIBER, {
       totalChannelSubscribersCount:totalSubscribedCount,
-      isSubscribed:true
+      isSubscribed: newSubscription._id == userId ? true : false
     });
 
     res.status(200).json(

@@ -9,7 +9,7 @@ import {verifyJWT} from "../middlewares/auth.middleware.js"
 const router = Router();
 
 router
-    .route("/c/:channelId")
+    .route("/c/:channelId/:videoId")
     .get(getUserChannelSubscribers)
     .post(verifyJWT, toggleSubscription);
 

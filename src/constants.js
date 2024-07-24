@@ -20,7 +20,6 @@ const SocketEventEnum = Object.freeze({
     REMOVE_REACTION:'removeReaction',
     REMOVE_COMMENT_REACTION:'removeCommentReaction',
     ADDED_DISLIKE:'addedDislike',
-    JOIN_CHANNEL:'joinChannel',
     ADD_SUBSCRIBER:'addSubscriber',
     REMOVE_SUBSCRIBER:'removeSubscriber',
 });
