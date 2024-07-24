@@ -12,7 +12,7 @@ import {
   updateUserDetails,
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { bothUserCanAccessJWT, verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
@@ -32,7 +32,7 @@ router.route("/register").post(
 
 router.route("/login").post(login);
 router.route("/refresh-token").post(refreshToken);
-router.route("/get-user-channel/:username").get(getChannelProfile);
+router.route("/get-user-channel/:username").get(bothUserCanAccessJWT, getChannelProfile);
 // Secure Route
 router.route("/change-password").post(verifyJWT, changedPassword);
 router.route("/watch-history").get(verifyJWT, getWatchHistory);

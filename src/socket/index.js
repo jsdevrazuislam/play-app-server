@@ -14,6 +14,7 @@ const joinRoom = (socket, eventEnum, roomPrefix) => {
 // Usage of the reusable function for each specific event
 const setupSocketListeners = (socket) => {
   joinRoom(socket, SocketEventEnum.JOIN_VIDEO, "video");
+  joinRoom(socket, SocketEventEnum.JOIN_CHANNEL, "channel");
   joinRoom(socket, SocketEventEnum.JOIN_NOTIFICATION, "notification");
   // joinRoom(socket, SocketEventEnum.JOIN_LIKE, "like");
   // joinRoom(socket, SocketEventEnum.JOIN_DISLIKE, "dislike");

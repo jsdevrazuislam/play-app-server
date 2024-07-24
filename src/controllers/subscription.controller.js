@@ -3,6 +3,8 @@ import { Subscription } from "../models/subscriptions.models.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import { SocketEventEnum } from "../constants.js";
+import { emitSocketEvent } from "../socket/index.js";
 
 const toggleSubscription = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Subscription']
@@ -20,16 +22,40 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 
   // Check if the subscription already exists
   const subscription = await Subscription.findOne({
-    subscriber: userId,
-    channel: channelId,
+    $and: [
+      {
+        subscriber: userId,
+      },
+      {
+        channel: channelId,
+      },
+    ],
   });
 
   if (subscription) {
     // Unsubscribe (delete the subscription)
     await Subscription.deleteOne({ _id: subscription._id });
+    const totalSubscribedCount = await Subscription.countDocuments({
+      subscriber: userId,
+    });
+    emitSocketEvent(
+      req,
+      `video_${channelId}`,
+      SocketEventEnum.REMOVE_SUBSCRIBER,
+      {
+        totalChannelSubscribersCount:totalSubscribedCount,
+        isSubscribed:false
+      }
+    );
     res
       .status(200)
-      .json(new ApiResponse(200, null, "Unsubscribed successfully"));
+      .json(
+        new ApiResponse(
+          200,
+          { totalChannelSubscribersCount:totalSubscribedCount, isSubscribed:false },
+          "Unsubscribed successfully"
+        )
+      );
   } else {
     // Subscribe (create a new subscription)
     const newSubscription = await Subscription.create({
@@ -37,9 +63,26 @@ const toggleSubscription = asyncHandler(async (req, res) => {
       channel: channelId,
     });
 
-    res
-      .status(200)
-      .json(new ApiResponse(200, newSubscription, "Subscribed successfully"));
+    const totalSubscribedCount = await Subscription.countDocuments({
+      subscriber: userId,
+    });
+
+    emitSocketEvent(req, `video_${channelId}`, SocketEventEnum.ADD_SUBSCRIBER, {
+      totalChannelSubscribersCount:totalSubscribedCount,
+      isSubscribed:true
+    });
+
+    res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          ...newSubscription._doc,
+          totalChannelSubscribersCount:totalSubscribedCount,
+          isSubscribed:true
+        },
+        "Subscribed successfully"
+      )
+    );
   }
 });
 // controller to return subscriber list of a channel

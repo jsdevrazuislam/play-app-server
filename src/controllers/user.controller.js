@@ -152,7 +152,7 @@ const logout = asyncHandler(async (req, res) => {
 });
 
 const refreshToken = asyncHandler(async (req, res) => {
-   // #swagger.tags = ['Users']
+  // #swagger.tags = ['Users']
   // get token from user
   const incomingRefreshToken =
     req.cookies?.refreshToken || req.body?.refreshToken;
@@ -339,17 +339,19 @@ const getChannelProfile = asyncHandler(async (req, res) => {
           $size: "$subscribedTo",
         },
         isSubscribed: {
-          $cond: {
-            if: {
-              $in: [
-                { $ifNull: [req.user?._id, ""] },
-                "$subscribers.subscriber",
-              ],
+          $let: {
+            vars: {
+              userId: { $toObjectId: req.user?._id.toString() },
             },
-            then: true,
-            else: false,
+            in: {
+              $cond: {
+                if: { $in: ['$$userId', '$subscribers.subscriber'] },
+                then: true,
+                else: false,
+              },
+            },
           },
-        },
+        },  
       },
     },
     {

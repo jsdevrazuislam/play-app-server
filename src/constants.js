@@ -10,15 +10,19 @@ const SocketEventEnum = Object.freeze({
     ADD_TWEET_COMMENT:'addTweetComment',
     UPDATE_TWEET_COMMENT:'updateTweetComment',
     PUBLISH_VIDEO:"publishVideo",
-    // JOIN_COMMENT:'joinComment',
+    JOIN_COMMENT:'joinComment',
     JOIN_NOTIFICATION:'joinNotification',
     SOCKET_ERROR:'socketError',
     JOIN_VIDEO:'joinVideo',
-    // JOIN_LIKE:'joinLike',
-    // JOIN_DISLIKE:'joinDislike',
+    COMMENT_LIKE:'commentLike',
+    COMMENT_DISLIKE:'commentDislike',
     ADDED_LIKE:'addedLike',
     REMOVE_REACTION:'removeReaction',
+    REMOVE_COMMENT_REACTION:'removeCommentReaction',
     ADDED_DISLIKE:'addedDislike',
+    JOIN_CHANNEL:'joinChannel',
+    ADD_SUBSCRIBER:'addSubscriber',
+    REMOVE_SUBSCRIBER:'removeSubscriber',
 });
 
 export {

@@ -109,31 +109,91 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
   /* #swagger.security = [{
             "bearerAuth": []
     }] */
-  const { commentId } = req.params;
+  const { commentId, videoId } = req.params;
+  const { reaction } = req.body; 
   //TODO: toggle like on comment
   if (!isValidObjectId(commentId))
     throw new ApiError(400, "Video is not valid");
-  const comment = await Like.findOne({
-    comment: commentId,
-    likedBy: req?.user?._id,
-  });
-  if (comment) {
-    await Like.deleteOne({
-      _id: comment._id,
-      likedBy: req?.user?._id,
-    });
-    res
-      .status(200)
-      .json(new ApiResponse(200, null, "Comment unlike successfully"));
-  } else {
-    await Like.create({
-      comment: commentId,
-      likedBy: req?.user?._id,
-    });
+  let like = await Like.findOne({ comment: commentId });
 
+  const userId = req.user._id;
+  let totalLike = 0;
+  let totalUnlike = 0;
+
+  if (!like) {
+    like = new Like({ comment: commentId, likedBy: [], disLikedBy: [] });
+  }
+
+  if (reaction === "like") {
+    if (like.likedBy.includes(userId)) {
+      like.likedBy = like.likedBy.filter((id) => !id.equals(userId));
+    } else {
+      like.likedBy.addToSet(userId);
+      like.disLikedBy = like.disLikedBy.filter((id) => !id.equals(userId));
+    }
+  } else if (reaction === "dislike") {
+    if (like.disLikedBy.includes(userId)) {
+      like.disLikedBy = like.disLikedBy.filter((id) => !id.equals(userId));
+    } else {
+      like.disLikedBy.addToSet(userId);
+      like.likedBy = like.likedBy.filter((id) => !id.equals(userId));
+    }
+  } else {
+    throw new ApiError(400, "Please prove valid body (like or dislike)");
+  }
+
+  await like.save();
+  // Populate likedBy and disLikedBy fields
+  await like.populate(
+    "likedBy",
+    "-password -watchHistory -refreshToken -updatedAt -createdAt -__v"
+  );
+  await like.populate(
+    "disLikedBy",
+    "-password -watchHistory -refreshToken -updatedAt -createdAt -__v"
+  );
+  totalLike = (like.likedBy || []).length;
+  totalUnlike = (like.disLikedBy || []).length;
+
+  // Only save if likedBy or disLikedBy is not empty
+  if (like.likedBy.length === 0 && like.disLikedBy.length === 0) {
+    if (like.isNew) {
+      res
+        .status(200)
+        .json(new ApiResponse(200, null, `${reaction} Successfully`));
+    } else {
+      await Like.deleteOne({ comment: commentId });
+      emitSocketEvent(
+        req,
+        `video_${videoId}`,
+        SocketEventEnum.REMOVE_COMMENT_REACTION,
+        {
+          like,
+          totalLike,
+          totalUnlike,
+        }
+      );
+      res
+        .status(200)
+        .json(new ApiResponse(200, null, `${reaction} remove Successfully`));
+    }
+  } else {
+    if (reaction === "like") {
+      emitSocketEvent(req, `video_${videoId}`, SocketEventEnum.COMMENT_LIKE, {
+        like,
+        totalLike,
+        totalUnlike,
+      });
+    } else {
+      emitSocketEvent(req, `video_${videoId}`, SocketEventEnum.COMMENT_DISLIKE, {
+        like,
+        totalLike,
+        totalUnlike,
+      });
+    }
     res
       .status(200)
-      .json(new ApiResponse(200, null, "Comment like successfully"));
+      .json(new ApiResponse(200, like, `${reaction} Successfully`));
   }
 });
 
@@ -227,4 +287,61 @@ const getLikedVideo = asyncHandler(async (req, res) => {
   );
 });
 
-export { toggleCommentLike, toggleTweetLike, toggleVideoLike, getLikedVideo };
+const getLikedComment = asyncHandler(async (req, res) => {
+  // #swagger.tags = ['Likes']
+  /* #swagger.security = [{
+            "bearerAuth": []
+    }] */
+  //TODO: get all liked videos
+  const { commentId } = req.params;
+  if (!isValidObjectId(commentId))
+    throw new ApiError(400, "Video Id is not valid");
+
+  const likesData = await Like.aggregate([
+    {
+      $match: {
+        comment: new mongoose.Types.ObjectId(commentId),
+      },
+    },
+    {
+      $facet: {
+        totalLikes: [
+          { $unwind: "$likedBy" },
+          { $group: { _id: null, count: { $sum: 1 } } },
+          { $project: { _id: 0, count: 1 } },
+        ],
+        totalDislikes: [
+          { $unwind: "$disLikedBy" },
+          { $group: { _id: null, count: { $sum: 1 } } },
+          { $project: { _id: 0, count: 1 } },
+        ],
+      },
+    },
+  ]);
+
+  const totalLikes = likesData[0].totalLikes[0]?.count || 0;
+  const totalDislikes = likesData[0].totalDislikes[0]?.count || 0;
+
+  const likesComments = await Like.find({ comment: commentId })
+    .populate(
+      "likedBy",
+      "-password -watchHistory -refreshToken -updatedAt -createdAt -__v"
+    )
+    .populate(
+      "disLikedBy",
+      "-password -watchHistory -refreshToken -updatedAt -createdAt -__v"
+    );
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        likesComments,
+        totalLikes,
+        totalDislikes,
+      },
+      "Liked comment fetched successfully"
+    )
+  );
+});
+
+export { toggleCommentLike, toggleTweetLike, toggleVideoLike, getLikedVideo, getLikedComment };

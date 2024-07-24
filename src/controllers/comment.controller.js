@@ -178,6 +178,9 @@ const deleteComment = asyncHandler(async (req, res) => {
     _id: commentId,
     owner: req.user?._id,
   });
+
+  const totalComments = await Comment.countDocuments();
+
   if (!comment)
     throw new ApiError(
       400,
@@ -186,7 +189,7 @@ const deleteComment = asyncHandler(async (req, res) => {
 
   res
     .status(200)
-    .json(new ApiResponse(200, null, "comment delete successfully"));
+    .json(new ApiResponse(200, totalComments, "comment delete successfully"));
 });
 
 export { getVideoComments, addComment, updateComment, deleteComment };
