@@ -5,6 +5,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { SocketEventEnum } from "../constants.js";
 import { emitSocketEvent } from "../socket/index.js";
+import { User } from "../models/user.models.js";
 
 const toggleSubscription = asyncHandler(async (req, res) => {
   // #swagger.tags = ['Subscription']
@@ -32,53 +33,101 @@ const toggleSubscription = asyncHandler(async (req, res) => {
     ],
   });
 
+  const channel = await User.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(channelId),
+      },
+    },
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "channel",
+        as: "subscribers",
+      },
+    },
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "subscriber",
+        as: "subscribedTo",
+      },
+    },
+    {
+      $addFields: {
+        totalChannelSubscribersCount: {
+          $size: "$subscribers",
+        },
+        totalSubscribedCount: {
+          $size: "$subscribedTo",
+        },
+        isSubscribed: {
+          $let: {
+            vars: {
+              userId: { $toObjectId: req.user?._id.toString() },
+            },
+            in: {
+              $cond: {
+                if: { $in: ["$$userId", "$subscribers.subscriber"] },
+                then: true,
+                else: false,
+              },
+            },
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        totalChannelSubscribersCount: 1,
+        totalSubscribedCount: 1,
+        isSubscribed: 1,
+      },
+    },
+  ]);
+
   if (subscription) {
     // Unsubscribe (delete the subscription)
     await Subscription.deleteOne({ _id: subscription._id });
-    const totalSubscribedCount = await Subscription.countDocuments({
-      subscriber: userId,
-    });
     emitSocketEvent(
       req,
       `video_${videoId}`,
       SocketEventEnum.REMOVE_SUBSCRIBER,
       {
-        totalChannelSubscribersCount:totalSubscribedCount,
-        isSubscribed:false
+        totalChannelSubscribersCount: channel[0].totalChannelSubscribersCount,
+        isSubscribed: channel[0].isSubscribed,
       }
     );
-    res
-      .status(200)
-      .json(
-        new ApiResponse(
-          200,
-          { totalChannelSubscribersCount:totalSubscribedCount, isSubscribed:false },
-          "Unsubscribed successfully"
-        )
-      );
+    res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          totalChannelSubscribersCount: channel[0].totalChannelSubscribersCount,
+          isSubscribed: channel[0].isSubscribed,
+        },
+        "Unsubscribed successfully"
+      )
+    );
   } else {
     // Subscribe (create a new subscription)
-    const newSubscription = await Subscription.create({
+    await Subscription.create({
       subscriber: userId,
       channel: channelId,
     });
 
-    const totalSubscribedCount = await Subscription.countDocuments({
-      subscriber: userId,
-    });
-
     emitSocketEvent(req, `video_${videoId}`, SocketEventEnum.ADD_SUBSCRIBER, {
-      totalChannelSubscribersCount:totalSubscribedCount,
-      isSubscribed: newSubscription._id == userId ? true : false
+      totalChannelSubscribersCount: channel[0].totalChannelSubscribersCount,
+      isSubscribed: channel[0].isSubscribed,
     });
 
     res.status(200).json(
       new ApiResponse(
         200,
         {
-          ...newSubscription._doc,
-          totalChannelSubscribersCount:totalSubscribedCount,
-          isSubscribed:true
+          totalChannelSubscribersCount: channel[0].totalChannelSubscribersCount,
+          isSubscribed: channel[0].isSubscribed,
         },
         "Subscribed successfully"
       )
